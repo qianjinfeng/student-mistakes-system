@@ -1,0 +1,117 @@
+# Student Mistakes Management System Configuration
+
+# Database settings
+database:
+  url: "postgresql://postgres:postgres@localhost:5432/student_mistakes"
+  pool_size: 10
+  max_overflow: 20
+
+# Redis settings
+redis:
+  url: "redis://localhost:6379/0"
+  db: 0
+
+# AI Model settings
+ai:
+  qwen:
+    api_key: "${QWEN_API_KEY}"
+    base_url: "${QWEN_BASE_URL}"
+    model: "qwen-vl-chat"
+    temperature: 0.7
+    max_tokens: 1000
+  local_models_path: "./models"
+
+# OCR settings
+ocr:
+  paddleocr:
+    use_gpu: false
+    lang: "ch"
+    det_db_thresh: 0.3
+    det_db_box_thresh: 0.6
+    det_db_unclip_ratio: 1.5
+
+# Security settings
+security:
+  secret_key: "${SECRET_KEY}"
+  algorithm: "HS256"
+  access_token_expire_minutes: 30
+  refresh_token_expire_days: 7
+
+# File upload settings
+upload:
+  max_file_size: 5242880  # 5MB in bytes
+  allowed_extensions: [".png", ".jpg", ".jpeg"]
+  upload_dir: "./uploads"
+
+# Gamification settings
+gamification:
+  achievements:
+    streak_7_days:
+      name: "连续学习7天"
+      description: "连续7天完成复习任务"
+      points: 50
+    streak_30_days:
+      name: "学习达人"
+      description: "连续30天完成复习任务"
+      points: 200
+    total_reviews_100:
+      name: "百题达人"
+      description: "完成100次复习"
+      points: 150
+    accuracy_90:
+      name: "精准学习者"
+      description: "平均正确率达到90%"
+      points: 100
+
+  points:
+    mistake_uploaded: 10
+    review_completed: 5
+    correct_answer: 15
+    streak_bonus: 2  # multiplier per day
+
+# Spaced Repetition settings (SM-2 Algorithm)
+spaced_repetition:
+  initial_interval: 1  # days
+  initial_ease_factor: 2.5
+  min_ease_factor: 1.3
+  max_ease_factor: 2.5
+  easy_multiplier: 1.3
+  good_multiplier: 1.0
+  hard_multiplier: 0.8
+
+# Email/SMS settings (for future notifications)
+notifications:
+  email:
+    enabled: false
+    smtp_server: "smtp.gmail.com"
+    smtp_port: 587
+    sender_email: "${NOTIFICATION_EMAIL}"
+    sender_password: "${NOTIFICATION_PASSWORD}"
+  sms:
+    enabled: false
+
+# Logging settings
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "./logs/app.log"
+
+# API settings
+api:
+  host: "0.0.0.0"
+  port: 8000
+  debug: true
+  cors_origins: ["http://localhost:3000", "http://127.0.0.1:3000"]
+
+# Celery settings
+celery:
+  broker_url: "redis://localhost:6379/0"
+  result_backend: "redis://localhost:6379/0"
+  timezone: "UTC"
+  beat_schedule:
+    daily_review_reminder:
+      task: "services.tasks.send_daily_reminder"
+      schedule: 86400  # 24 hours in seconds
+    cleanup_old_files:
+      task: "services.tasks.cleanup_old_uploads"
+      schedule: 604800  # 7 days in seconds
