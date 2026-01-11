@@ -274,7 +274,7 @@ build/
 dist/
 
 # Python
-__pycache__/
+*/__pycache__/
 *.py[cod]
 *$py.class
 *.so
@@ -344,11 +344,13 @@ Desktop.ini
 # Frontend build
 frontend/dist/
 frontend/build/
+frontend/node_modules/
 
 # Backend
 backend/__pycache__/
 backend/*.pyc
 backend/.coverage
+backend/venv/*
 
 # Testing
 .coverage

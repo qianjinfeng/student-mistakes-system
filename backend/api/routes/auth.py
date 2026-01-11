@@ -11,7 +11,27 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from config.settings import settings
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+
+try:
+    from config.settings import settings
+except ImportError:
+    # Fallback settings for development
+    class FallbackSettings:
+        class Security:
+            secret_key = "fallback-secret-key"
+            algorithm = "HS256"
+            access_token_expire_minutes = 30
+
+        class Database:
+            url = "postgresql://postgres:postgres@localhost:5432/student_mistakes"
+
+        security = Security()
+        database = Database()
+
+    settings = FallbackSettings()
 from database.connection import get_db
 from models.user import User
 

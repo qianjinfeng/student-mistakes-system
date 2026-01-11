@@ -33,18 +33,17 @@ services:
   # Backend API
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
+      context: ./backend
+      dockerfile: Dockerfile
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/student_mistakes
       - REDIS_URL=redis://redis:6379/0
       - SECRET_KEY=your-secret-key-here
       - QWEN_API_KEY=${QWEN_API_KEY}
       - QWEN_BASE_URL=${QWEN_BASE_URL}
+      - PYTHONPATH=/app
     volumes:
-      - ./backend:/app
-      - ./models:/app/models
-      - ./config:/app/config
+      - uploads:/app/uploads
     ports:
       - "8000:8000"
     depends_on:
@@ -57,18 +56,17 @@ services:
   # Celery Worker
   celery:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
+      context: ./backend
+      dockerfile: Dockerfile
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/student_mistakes
       - REDIS_URL=redis://redis:6379/0
       - SECRET_KEY=your-secret-key-here
       - QWEN_API_KEY=${QWEN_API_KEY}
       - QWEN_BASE_URL=${QWEN_BASE_URL}
+      - PYTHONPATH=/app
     volumes:
-      - ./backend:/app
-      - ./models:/app/models
-      - ./config:/app/config
+      - uploads:/app/uploads
     depends_on:
       - redis
       - postgres
@@ -92,3 +90,4 @@ services:
 
 volumes:
   postgres_data:
+  uploads:

@@ -7,14 +7,12 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import and_, or_
+from sqlalchemy import and_
 
 from api.routes.auth import get_current_user
-from config.settings import settings
 from database.connection import get_db
 from models.user import User
 from models.scheduled_review import ScheduledReview
-from models.mistake import Mistake
 from models.review_history import ReviewHistory
 from services.review_scheduler import ReviewScheduler
 from services.gamification import GamificationEngine

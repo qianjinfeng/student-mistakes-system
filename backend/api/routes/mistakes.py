@@ -2,7 +2,6 @@
 Mistakes routes - handle mistake upload, analysis, and retrieval
 """
 
-import os
 import uuid
 from pathlib import Path
 from typing import List, Optional

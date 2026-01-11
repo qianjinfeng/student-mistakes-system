@@ -3,7 +3,6 @@ Celery tasks for background processing
 """
 
 import asyncio
-import os
 from datetime import datetime, timedelta
 from pathlib import Path
 import structlog
@@ -11,8 +10,6 @@ from celery import Celery
 
 from config.settings import settings
 from database.connection import init_db, close_db
-from services.review_scheduler import ReviewScheduler
-from services.gamification import GamificationEngine
 
 logger = structlog.get_logger()
 

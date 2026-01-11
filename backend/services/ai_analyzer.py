@@ -3,11 +3,9 @@ AI Analyzer using Qwen models
 """
 
 import asyncio
-import json
 from typing import List, Optional
 import structlog
 
-from config.settings import settings
 
 logger = structlog.get_logger()
 

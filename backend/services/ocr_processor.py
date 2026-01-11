@@ -3,10 +3,8 @@ OCR Processor using PaddleOCR (Mock implementation)
 """
 
 import asyncio
-from typing import Optional
 import structlog
 
-from config.settings import settings
 
 logger = structlog.get_logger()
 

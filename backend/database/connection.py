@@ -29,16 +29,10 @@ def get_db():
         db.close()
 
 
-def init_db():
+async def init_db():
     """Initialize database connection and create tables"""
     try:
         # Create tables if they don't exist
-        from models.user import User
-        from models.mistake import Mistake
-        from models.review_history import ReviewHistory
-        from models.achievement import Achievement
-        from models.user_progress import UserProgress
-        from models.scheduled_review import ScheduledReview
 
         # Import all models to ensure they are registered
         from models import base
