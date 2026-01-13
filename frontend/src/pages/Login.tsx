@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { apiClient } from '../api/client'
 
 interface LoginProps {
   onLogin: (user: any, token: string) => void
@@ -21,7 +22,6 @@ const Login = ({ onLogin }: LoginProps) => {
     setError('')
 
     try {
-      const endpoint = isLogin ? '/api/auth/token' : '/api/auth/register'
       const payload = isLogin
         ? new URLSearchParams({
             username: formData.username,
@@ -34,29 +34,13 @@ const Login = ({ onLogin }: LoginProps) => {
             password: formData.password
           }
 
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: isLogin
-          ? { 'Content-Type': 'application/x-www-form-urlencoded' }
-          : { 'Content-Type': 'application/json' },
-        body: isLogin ? payload.toString() : JSON.stringify(payload)
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.detail || '登录失败')
-      }
+      const data = isLogin
+        ? await apiClient.postForm('/api/auth/token', payload as URLSearchParams)
+        : await apiClient.post('/api/auth/register', payload as any)
 
       if (isLogin) {
         // Get user info
-        const userResponse = await fetch('/api/auth/me', {
-          headers: {
-            'Authorization': `Bearer ${data.access_token}`
-          }
-        })
-        const userData = await userResponse.json()
-
+        const userData = await apiClient.get('/api/auth/me', data.access_token)
         onLogin(userData, data.access_token)
       } else {
         // Registration successful, switch to login

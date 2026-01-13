@@ -38,7 +38,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/student_mistakes
       - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=your-secret-key-here
+      - SECRET_KEY=dev-secret-key-short
       - QWEN_API_KEY=${QWEN_API_KEY}
       - QWEN_BASE_URL=${QWEN_BASE_URL}
       - PYTHONPATH=/app
@@ -61,7 +61,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/student_mistakes
       - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=your-secret-key-here
+      - SECRET_KEY=dev-secret-key-short
       - QWEN_API_KEY=${QWEN_API_KEY}
       - QWEN_BASE_URL=${QWEN_BASE_URL}
       - PYTHONPATH=/app
@@ -80,11 +80,8 @@ services:
       dockerfile: Dockerfile
     environment:
       - VITE_API_URL=http://localhost:8000
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     ports:
-      - "3000:3000"
+      - "4173:4173"
     depends_on:
       - backend
 

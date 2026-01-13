@@ -81,7 +81,7 @@ class APISettings(BaseSettings):
     host: str = Field(default="0.0.0.0", env="API_HOST")
     port: int = Field(default=8000, env="API_PORT")
     debug: bool = Field(default=True, env="DEBUG")
-    cors_origins: List[str] = Field(default=["http://localhost:3000", "http://127.0.0.1:3000"])
+    cors_origins: List[str] = Field(default=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:4173", "http://127.0.0.1:4173"])
 
 
 class Settings(BaseSettings):
