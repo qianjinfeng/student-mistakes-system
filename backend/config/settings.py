@@ -27,21 +27,15 @@ class RedisSettings(BaseSettings):
 
 class AISettings(BaseSettings):
     """AI model configuration"""
-    qwen_api_key: Optional[SecretStr] = Field(default=None, env="QWEN_API_KEY")
+    qwen_api_key: Optional[SecretStr] = Field(default=None, env="DASHSCOPE_API_KEY")
     qwen_base_url: str = Field(default="https://dashscope.aliyuncs.com/api/v1", env="QWEN_BASE_URL")
-    qwen_model: str = Field(default="qwen-vl-chat")
+    qwen_model: str = Field(default="qwen3-vl-plus")
     qwen_temperature: float = Field(default=0.7)
-    qwen_max_tokens: int = Field(default=1000)
+    qwen_max_tokens: int = Field(default=2000)
     local_models_path: str = Field(default="./models")
 
 
-class OCRSettings(BaseSettings):
-    """OCR configuration"""
-    use_gpu: bool = Field(default=False)
-    lang: str = Field(default="ch")
-    det_db_thresh: float = Field(default=0.3)
-    det_db_box_thresh: float = Field(default=0.6)
-    det_db_unclip_ratio: float = Field(default=1.5)
+
 
 
 class SecuritySettings(BaseSettings):
@@ -89,7 +83,6 @@ class Settings(BaseSettings):
     database: DatabaseSettings = DatabaseSettings()
     redis: RedisSettings = RedisSettings()
     ai: AISettings = AISettings()
-    ocr: OCRSettings = OCRSettings()
     security: SecuritySettings = SecuritySettings()
     upload: UploadSettings = UploadSettings()
     gamification: GamificationSettings = GamificationSettings()

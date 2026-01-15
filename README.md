@@ -1,10 +1,10 @@
 # 学生错题管理系统 (Student Mistakes Management System)
 
-一个基于AI的智能学生错题管理系统，通过OCR技术识别错题图片，使用Qwen大模型进行错误分析，并通过间隔重复算法优化复习效果。
+一个基于AI视觉模型的智能学生错题管理系统，使用Qwen3-vl-plus直接分析错题图片进行智能错误分析，并通过间隔重复算法优化复习效果。
 
 ## 🎯 项目目标
 
-构建一个AI驱动的学生错题管理系统，帮助学习者通过智能追踪、分析和复习错题来提升学习效果。系统结合了**多模态AI (OCR + LLM)**、**间隔重复**和**游戏化**机制来增强学习动力和长期记忆。
+构建一个AI驱动的学生错题管理系统，帮助学习者通过智能追踪、分析和复习错题来提升学习效果。系统结合了**AI视觉模型 (Qwen3-vl-plus)**、**间隔重复**和**游戏化**机制来增强学习动力和长期记忆。
 
 ## 🧱 核心组件
 
@@ -13,20 +13,23 @@
 - **功能**: 图片上传/拍照、错题分析展示、复习任务、成就系统
 - **语言**: 简体中文用户界面
 
-### 2. OCR 识别层 (OCR Processor)
-- **技术**: PaddleOCR_VL
+### 2. AI 视觉分析层 (AI Vision Analyzer)
+- **技术**: Qwen3-vl-plus (DashScope API)
 - **功能**:
-  - 鲁棒的中文文本检测与识别
-  - 布局感知的题目分割
-  - 存储原始OCR结果用于调试
+  - 直接视觉分析错题图片（无需OCR预处理）
+  - 智能题目分割和识别
+  - 答案正确性判断
+  - 根本原因分析
+  - 个性化学习建议生成
 
 ### 3. AI 推理层 (AI Analyzer)
-- **技术**: Qwen (Qwen-VL 或 Qwen-Max)
+- **技术**: Qwen3-vl-plus
 - **功能**:
   - 判断答案正确性
   - 分类错误类型 (概念错误、计算错误、读题错误等)
-  - 基于过往相似错误的个性化洞察
-  - 可选生成相似练习题
+  - 分析错误根本原因
+  - 生成个性化学习建议
+  - 推荐相似练习题
 
 ### 4. 后端API (Backend API)
 - **技术栈**: FastAPI + Python
@@ -69,7 +72,9 @@ cd student-mistakes-system
 2. **配置环境变量**
 ```bash
 cp .env.example .env
-# 编辑 .env 文件，设置数据库和AI服务配置
+# 编辑 .env 文件，设置以下必要配置：
+# DASHSCOPE_API_KEY=your_qwen_api_key_here  # Qwen3-vl-plus API密钥
+# DATABASE_URL=postgresql://postgres:postgres@localhost:5432/student_mistakes
 ```
 
 3. **启动完整系统**
@@ -88,6 +93,11 @@ docker-compose up -d
 ```bash
 cd backend
 pip install -r requirements.txt
+
+# 设置Qwen API密钥
+export DASHSCOPE_API_KEY=your_api_key_here
+
+# 启动服务
 uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
 ```
 

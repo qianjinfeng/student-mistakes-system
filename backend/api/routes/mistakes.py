@@ -16,14 +16,12 @@ from config.settings import settings
 from database.connection import get_db
 from models.user import User
 from models.mistake import Mistake
-from services.ocr_processor import OCRProcessor
 from services.ai_analyzer import AIAnalyzer
 from services.gamification import GamificationEngine
 
 router = APIRouter()
 
 # Initialize services
-ocr_processor = OCRProcessor()
 ai_analyzer = AIAnalyzer()
 gamification = GamificationEngine()
 
@@ -38,7 +36,6 @@ class MistakeAnalysis(BaseModel):
 class MistakeResponse(BaseModel):
     id: str
     image_path: str
-    ocr_text: str
     subject: Optional[str] = None
     error_type: Optional[str] = None
     confidence: Optional[float] = None
@@ -89,22 +86,21 @@ async def upload_mistake(
         await f.write(file_content)
 
     try:
-        # Process OCR
-        ocr_result = await ocr_processor.process_image(str(file_path))
-
-        # AI Analysis
-        analysis = await ai_analyzer.analyze_mistake(ocr_result)
+        # Direct AI Analysis (no OCR step)
+        analysis = await ai_analyzer.analyze_image(str(file_path))
 
         # Create mistake record
         mistake = Mistake(
             user_id=current_user.id,
             image_path=str(file_path),
-            ocr_text=ocr_result,
             subject=subject,
             error_type=analysis.error_type,
             confidence=analysis.confidence,
             ai_insights={
                 "insights": analysis.insights,
+                "questions_found": analysis.questions_found,
+                "correct_answers": analysis.correct_answers,
+                "root_cause": analysis.root_cause,
                 "similar_questions": analysis.similar_questions
             }
         )
@@ -122,7 +118,6 @@ async def upload_mistake(
             mistake=MistakeResponse(
                 id=str(mistake.id),
                 image_path=mistake.image_path,
-                ocr_text=mistake.ocr_text,
                 subject=mistake.subject,
                 error_type=mistake.error_type,
                 confidence=float(mistake.confidence) if mistake.confidence else None,
@@ -164,7 +159,6 @@ async def get_user_mistakes(
         MistakeResponse(
             id=str(m.id),
             image_path=m.image_path,
-            ocr_text=m.ocr_text,
             subject=m.subject,
             error_type=m.error_type,
             confidence=float(m.confidence) if m.confidence else None,
@@ -197,7 +191,6 @@ async def get_mistake(
     return MistakeResponse(
         id=str(mistake.id),
         image_path=mistake.image_path,
-        ocr_text=mistake.ocr_text,
         subject=mistake.subject,
         error_type=mistake.error_type,
         confidence=float(mistake.confidence) if mistake.confidence else None,

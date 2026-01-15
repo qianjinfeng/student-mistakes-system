@@ -1,4 +1,6 @@
-version: '3.8'
+networks:
+  app-network:
+    driver: bridge
 
 services:
   # Database
@@ -18,6 +20,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    networks:
+      - app-network
 
   # Redis for Celery and caching
   redis:
@@ -29,6 +33,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    networks:
+      - app-network
 
   # Backend API
   backend:
@@ -52,6 +58,8 @@ services:
       redis:
         condition: service_healthy
     command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - app-network
 
   # Celery Worker
   celery:
@@ -72,6 +80,8 @@ services:
       - postgres
       - backend
     command: celery -A services.celery_app worker --loglevel=info
+    networks:
+      - app-network
 
   # Frontend
   frontend:
@@ -79,11 +89,13 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=http://backend:8000
     ports:
       - "4173:4173"
     depends_on:
       - backend
+    networks:
+      - app-network
 
 volumes:
   postgres_data:

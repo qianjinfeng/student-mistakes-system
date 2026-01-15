@@ -16,10 +16,12 @@ python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.6
 
-# AI/ML (optional - can be installed separately)
-# transformers>=4.35.0
-# torch>=2.2.0
-# modelscope>=1.10.0
+# AI/ML 
+dashscope>=1.17.0
+pillow>=10.0.0
+# transformers>=4.35.0  # Optional for local models
+# torch>=2.2.0         # Optional for local models
+# modelscope>=1.10.0    # Optional for local models
 
 # OCR (optional - can be installed separately)
 # paddlepaddle>=2.6.0

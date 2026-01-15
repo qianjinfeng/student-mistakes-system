@@ -74,29 +74,53 @@ def test_login_user(client):
         assert data["token_type"] == "bearer"
 
 
-# OCR Processor Tests
-def test_ocr_processor_initialization():
-    """Test OCR processor can be initialized"""
-    from backend.services.ocr_processor import OCRProcessor
-
-    processor = OCRProcessor()
-    assert processor is not None
-    # Note: Full OCR testing would require actual image files and mock setup
-
-
-# AI Analyzer Tests
+# AI Vision Analyzer Tests
 @pytest.mark.asyncio
-async def test_ai_analyzer_empty_text():
-    """Test AI analyzer handles empty text"""
+async def test_ai_analyzer_empty_image():
+    """Test AI analyzer handles non-existent image"""
     from backend.services.ai_analyzer import AIAnalyzer
 
     analyzer = AIAnalyzer()
-    result = await analyzer.analyze_mistake("")
+    result = await analyzer.analyze_image("/non/existent/path.jpg")
 
     assert result is not None
     assert result.error_type == "unknown"
     assert result.confidence == 0.0
     assert len(result.insights) > 0
+    assert "不存在" in result.insights[0]
+
+
+@pytest.mark.asyncio
+async def test_ai_analyzer_equation_image():
+    """Test AI analyzer with equation image mock"""
+    from backend.services.ai_analyzer import AIAnalyzer
+
+    analyzer = AIAnalyzer()
+    result = await analyzer.analyze_image("/path/to/equation_problem.jpg")
+
+    assert result is not None
+    assert result.error_type == "calculation"
+    assert result.confidence > 0.8
+    assert len(result.questions_found) > 0
+    assert len(result.correct_answers) > 0
+    assert result.root_cause is not None
+    assert "符号" in result.root_cause
+
+
+@pytest.mark.asyncio
+async def test_ai_analyzer_geometry_image():
+    """Test AI analyzer with geometry image mock"""
+    from backend.services.ai_analyzer import AIAnalyzer
+
+    analyzer = AIAnalyzer()
+    result = await analyzer.analyze_image("/path/to/geometry_problem.jpg")
+
+    assert result is not None
+    assert result.error_type == "conceptual"
+    assert result.confidence > 0.8
+    assert len(result.questions_found) > 0
+    assert len(result.correct_answers) > 0
+    assert "三角形" in result.root_cause
 
 
 # Gamification Tests

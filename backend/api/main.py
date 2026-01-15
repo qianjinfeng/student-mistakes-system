@@ -87,10 +87,15 @@ app.include_router(mistakes.router, prefix="/mistakes", tags=["Mistakes"])
 app.include_router(reviews.router, prefix="/reviews", tags=["Reviews"])
 app.include_router(achievements.router, prefix="/achievements", tags=["Achievements"])
 
-# Health check endpoint
+# Health check endpoints
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
+    return {"status": "healthy", "service": "student-mistakes-api"}
+
+@app.get("/api/health") 
+async def api_health_check():
+    """API health check endpoint for frontend proxy"""
     return {"status": "healthy", "service": "student-mistakes-api"}
 
 # Root endpoint

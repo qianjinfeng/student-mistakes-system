@@ -13,22 +13,14 @@ redis:
 
 # AI Model settings
 ai:
-  qwen:
-    api_key: "${QWEN_API_KEY}"
-    base_url: "${QWEN_BASE_URL}"
-    model: "qwen-vl-chat"
-    temperature: 0.7
-    max_tokens: 1000
+  qwen_api_key: "${DASHSCOPE_API_KEY}"
+  qwen_base_url: "https://dashscope.aliyuncs.com/api/v1"
+  qwen_model: "qwen3-vl-plus"
+  qwen_temperature: 0.7
+  qwen_max_tokens: 2000
   local_models_path: "./models"
 
-# OCR settings
-ocr:
-  paddleocr:
-    use_gpu: false
-    lang: "ch"
-    det_db_thresh: 0.3
-    det_db_box_thresh: 0.6
-    det_db_unclip_ratio: 1.5
+
 
 # Security settings
 security:
