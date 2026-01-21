@@ -38,12 +38,7 @@ const Dashboard = () => {
 
   const fetchUserStats = async () => {
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch('/api/achievements/stats', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
+      const response = await fetch('/api/achievements/stats')
 
       if (response.ok) {
         const data = await response.json()
@@ -56,12 +51,7 @@ const Dashboard = () => {
 
   const fetchReviewPlan = async () => {
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch('/api/reviews/daily-plan', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
+      const response = await fetch('/api/reviews/daily-plan')
 
       if (response.ok) {
         const data = await response.json()

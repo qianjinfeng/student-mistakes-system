@@ -9,9 +9,7 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import and_
 
-from api.routes.auth import get_current_user
 from database.connection import get_db
-from models.user import User
 from models.scheduled_review import ScheduledReview
 from models.review_history import ReviewHistory
 from services.review_scheduler import ReviewScheduler
@@ -51,7 +49,6 @@ class DailyReviewPlan(BaseModel):
 @router.get("/daily-plan", response_model=DailyReviewPlan)
 async def get_daily_review_plan(
     date: Optional[str] = None,
-    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Get scheduled reviews for today or specified date"""
@@ -71,7 +68,6 @@ async def get_daily_review_plan(
         db.query(ScheduledReview)
         .filter(
             and_(
-                ScheduledReview.user_id == current_user.id,
                 ScheduledReview.scheduled_date >= target_date,
                 ScheduledReview.scheduled_date < target_date.replace(day=target_date.day + 1),
                 ScheduledReview.is_completed == False
@@ -112,7 +108,6 @@ async def get_daily_review_plan(
 @router.post("/complete")
 async def complete_reviews(
     review_sessions: List[ReviewSession],
-    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Complete review sessions and update spaced repetition schedule"""
@@ -125,7 +120,6 @@ async def complete_reviews(
             .filter(
                 and_(
                     ScheduledReview.mistake_id == session.mistake_id,
-                    ScheduledReview.user_id == current_user.id,
                     ScheduledReview.is_completed == False
                 )
             )
@@ -159,7 +153,6 @@ async def complete_reviews(
         if next_review_date:
             new_scheduled_review = ScheduledReview(
                 mistake_id=scheduled_review.mistake_id,
-                user_id=current_user.id,
                 scheduled_date=next_review_date,
                 interval_days=new_interval,
                 ease_factor=new_ease_factor,
@@ -170,7 +163,6 @@ async def complete_reviews(
         # Record review history
         review_history = ReviewHistory(
             mistake_id=scheduled_review.mistake_id,
-            user_id=current_user.id,
             performance_rating=session.performance_rating,
             time_spent_seconds=session.time_spent_seconds,
             notes=session.notes
@@ -179,14 +171,14 @@ async def complete_reviews(
 
         # Award points for review completion
         points_awarded = await gamification.award_points(
-            db, str(current_user.id), "review_completed"
+            db, "anonymous", "review_completed"
         )
 
         # Update streak
-        await gamification.update_streak(db, str(current_user.id))
+        await gamification.update_streak(db, "anonymous")
 
         # Check for achievements
-        new_achievements = await gamification.check_achievements(db, str(current_user.id))
+        new_achievements = await gamification.check_achievements(db, "anonymous")
 
         completed_reviews.append({
             "mistake_id": session.mistake_id,
@@ -207,13 +199,11 @@ async def complete_reviews(
 async def get_review_history(
     skip: int = 0,
     limit: int = 50,
-    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Get user's review history"""
+    """Get all review history"""
     result = await db.execute(
         db.query(ReviewHistory)
-        .filter(ReviewHistory.user_id == current_user.id)
         .order_by(ReviewHistory.review_date.desc())
         .offset(skip)
         .limit(limit)

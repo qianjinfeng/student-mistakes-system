@@ -11,10 +11,8 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.routes.auth import get_current_user
 from config.settings import settings
 from database.connection import get_db
-from models.user import User
 from models.mistake import Mistake
 from services.ai_analyzer import AIAnalyzer
 from services.gamification import GamificationEngine
@@ -53,7 +51,6 @@ class MistakeUploadResponse(BaseModel):
 async def upload_mistake(
     file: UploadFile = File(...),
     subject: Optional[str] = None,
-    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Upload and analyze a mistake image"""
@@ -91,7 +88,6 @@ async def upload_mistake(
 
         # Create mistake record
         mistake = Mistake(
-            user_id=current_user.id,
             image_path=str(file_path),
             subject=subject,
             error_type=analysis.error_type,
@@ -111,7 +107,7 @@ async def upload_mistake(
 
         # Award points for mistake upload
         points_awarded = await gamification.award_points(
-            db, current_user.id, "mistake_uploaded"
+            db, "anonymous", "mistake_uploaded"
         )
 
         return MistakeUploadResponse(
@@ -142,13 +138,11 @@ async def upload_mistake(
 async def get_user_mistakes(
     skip: int = 0,
     limit: int = 50,
-    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Get user's mistakes"""
+    """Get all mistakes"""
     result = await db.execute(
         db.query(Mistake)
-        .filter(Mistake.user_id == current_user.id)
         .order_by(Mistake.created_at.desc())
         .offset(skip)
         .limit(limit)
@@ -172,13 +166,12 @@ async def get_user_mistakes(
 @router.get("/{mistake_id}", response_model=MistakeResponse)
 async def get_mistake(
     mistake_id: str,
-    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Get specific mistake"""
     result = await db.execute(
         db.query(Mistake)
-        .filter(Mistake.id == mistake_id, Mistake.user_id == current_user.id)
+        .filter(Mistake.id == mistake_id)
     )
     mistake = result.scalars().first()
 
@@ -202,13 +195,12 @@ async def get_mistake(
 @router.get("/{mistake_id}/image")
 async def get_mistake_image(
     mistake_id: str,
-    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Get mistake image file"""
     result = await db.execute(
         db.query(Mistake)
-        .filter(Mistake.id == mistake_id, Mistake.user_id == current_user.id)
+        .filter(Mistake.id == mistake_id)
     )
     mistake = result.scalars().first()
 

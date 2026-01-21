@@ -7,9 +7,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from api.routes.auth import get_current_user
 from database.connection import get_db
-from models.user import User
 from models.achievement import Achievement
 from services.gamification import GamificationEngine
 
@@ -38,13 +36,10 @@ class UserStatsResponse(BaseModel):
 
 @router.get("/", response_model=List[AchievementResponse])
 def get_user_achievements(
-    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get user's unlocked achievements"""
-    achievements = db.query(Achievement).filter(
-        Achievement.user_id == current_user.id
-    ).order_by(Achievement.unlocked_at.desc()).all()
+    """Get all unlocked achievements"""
+    achievements = db.query(Achievement).order_by(Achievement.unlocked_at.desc()).all()
 
     return [
         AchievementResponse(
@@ -61,12 +56,18 @@ def get_user_achievements(
 
 @router.get("/stats", response_model=UserStatsResponse)
 def get_user_stats(
-    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get user's comprehensive statistics"""
-    stats = gamification.get_user_stats(db, str(current_user.id))
-    return UserStatsResponse(**stats)
+    """Get system-wide statistics"""
+    # For anonymous system, return default stats
+    return UserStatsResponse(
+        current_streak=0,
+        longest_streak=0,
+        total_reviews=0,
+        total_points=0,
+        achievements_count=0,
+        last_review_date=None
+    )
 
 
 @router.get("/available")

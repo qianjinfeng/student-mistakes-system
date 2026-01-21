@@ -38,12 +38,6 @@ class AISettings(BaseSettings):
 
 
 
-class SecuritySettings(BaseSettings):
-    """Security configuration"""
-    secret_key: SecretStr = Field(default="your-secret-key-here", env="SECRET_KEY")
-    algorithm: str = Field(default="HS256")
-    access_token_expire_minutes: int = Field(default=30)
-    refresh_token_expire_days: int = Field(default=7)
 
 
 class UploadSettings(BaseSettings):
@@ -83,7 +77,6 @@ class Settings(BaseSettings):
     database: DatabaseSettings = DatabaseSettings()
     redis: RedisSettings = RedisSettings()
     ai: AISettings = AISettings()
-    security: SecuritySettings = SecuritySettings()
     upload: UploadSettings = UploadSettings()
     gamification: GamificationSettings = GamificationSettings()
     api: APISettings = APISettings()

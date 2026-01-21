@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 import structlog
 import uvicorn
 
-from api.routes import auth, mistakes, reviews, achievements
+from api.routes import mistakes, reviews, achievements
 from config.settings import settings
 from database.connection import init_db
 from services.celery_app import celery_app
@@ -82,10 +82,9 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 # Include routers
-app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
-app.include_router(mistakes.router, prefix="/mistakes", tags=["Mistakes"])
-app.include_router(reviews.router, prefix="/reviews", tags=["Reviews"])
-app.include_router(achievements.router, prefix="/achievements", tags=["Achievements"])
+app.include_router(mistakes.router, prefix="/api/mistakes", tags=["Mistakes"])
+app.include_router(reviews.router, prefix="/api/reviews", tags=["Reviews"])
+app.include_router(achievements.router, prefix="/api/achievements", tags=["Achievements"])
 
 # Health check endpoints
 @app.get("/health")

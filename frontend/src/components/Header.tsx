@@ -1,18 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 
-interface User {
-  id: string
-  username: string
-  email: string
-  full_name?: string
-}
-
-interface HeaderProps {
-  user: User
-  onLogout: () => void
-}
-
-const Header = ({ user, onLogout }: HeaderProps) => {
+const Header = () => {
   const location = useLocation()
 
   const navItems = [
@@ -48,14 +36,8 @@ const Header = ({ user, onLogout }: HeaderProps) => {
           </div>
           <div className="flex items-center space-x-4">
             <span className="text-sm text-gray-600">
-              欢迎，{user.full_name || user.username}
+              欢迎使用
             </span>
-            <button
-              onClick={onLogout}
-              className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
-            >
-              退出登录
-            </button>
           </div>
         </div>
       </div>

@@ -52,15 +52,9 @@ class ApiClient {
     return response.json()
   }
 
-  async get(endpoint: string, token?: string) {
-    const headers: Record<string, string> = {}
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`
-    }
-
+  async get(endpoint: string) {
     return this.request(endpoint, {
       method: 'GET',
-      headers,
     })
   }
 }

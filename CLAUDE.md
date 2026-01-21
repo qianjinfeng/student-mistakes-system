@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 ## 🎯 Project Goal  
-Build an **AI-powered Student Mistakes Management System** that helps learners improve by intelligently tracking, analyzing, and reviewing their mistakes—especially from handwritten or printed Chinese-language questions captured via images. The system combines **multimodal AI (OCR + LLM)**, **spaced repetition**, and **gamification** to boost engagement and long-term retention.
+Build an **AI-powered Student Mistakes Management System** that helps learners improve by intelligently tracking, analyzing, and reviewing their mistakes—especially from handwritten or printed Chinese-language questions captured via images. The system combines **multimodal AI LLM**, **spaced repetition**, and **gamification** to boost engagement and long-term retention.
 
 All user-facing content is in **Simplified Chinese**; code, docs, and internal logic use **English**.
 
@@ -15,30 +15,25 @@ All user-facing content is in **Simplified Chinese**; code, docs, and internal l
 - Displays mistake insights, review tasks, achievements, and streaks
 - Communicates with backend via **Axios**
 
-### 2. **OCR Layer** (`ocr_processor.py`)
-- Uses **PaddleOCR_VL** for:
-  - Robust Chinese text detection & recognition
-  - Layout-aware segmentation of questions from images
-- Outputs structured text + bounding boxes
-- Stores raw OCR results for debugging/reprocessing
 
-### 3. **AI Reasoning Layer** (`ai_analyzer.py`)
+### 2. **AI Reasoning Layer** (`ai_analyzer.py`)
 - Interfaces with **Qwen** (Qwen-VL or Qwen-Max via API/local)
-- Input: OCR text + optional image context
+- Input: image context with appropriate prompts
 - Functions:
+  - analyze image and return structured responses
   - Judge answer correctness
   - Classify error type (e.g., *conceptual*, *calculation*, *misreading*)
   - Generate personalized insights based on similar past mistakes
   - Optionally generate **similar practice questions**
 - All prompts are **versioned and logged**
 
-### 4. **Backend API** (`/api`, built with **FastAPI**)
+### 3. **Backend API** (`/api`, built with **FastAPI**)
 - RESTful/GraphQL interface
 - Orchestrates calls between OCR, AI, DB, and scheduler
 - Handles auth (**OAuth2 / JWT**), file validation, and rate limiting
 - Secure file upload: validate image type (PNG/JPG), limit size
 
-### 5. **Database** (`database/schema.sql`, PostgreSQL)
+### 4. **Database** (`database/schema.sql`, PostgreSQL)
 Stores:
 - `Mistake`: image_id, ocr_text, subject, error_type, timestamp, user_id
 - `User`: progress, streak, total_points

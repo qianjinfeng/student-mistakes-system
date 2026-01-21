@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 
 interface MistakeAnalysis {
@@ -11,7 +11,6 @@ interface MistakeAnalysis {
 interface UploadResponse {
   mistake: {
     id: string
-    ocr_text: string
     error_type?: string
     confidence?: number
     ai_insights?: any
@@ -41,12 +40,8 @@ const UploadMistake = () => {
         formData.append('subject', subject)
       }
 
-      const token = localStorage.getItem('token')
       const response = await fetch('/api/mistakes/upload', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
         body: formData
       })
 
@@ -96,7 +91,7 @@ const UploadMistake = () => {
             <select
               id="subject"
               value={subject}
-              onChange={(e) => setSubject(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSubject(e.target.value)}
               className="block w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">选择科目</option>
@@ -179,22 +174,13 @@ const UploadMistake = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">识别的文本</h3>
-              <div className="bg-gray-50 rounded p-4">
-                <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                  {result.mistake.ocr_text}
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">AI 分析结果</h3>
-              <div className="space-y-4">
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">AI 分析结果</h3>
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <span className="text-sm font-medium text-gray-500">错误类型：</span>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ml-2 ${
                     result.analysis.error_type === 'conceptual' ? 'bg-red-100 text-red-800' :
                     result.analysis.error_type === 'calculation' ? 'bg-yellow-100 text-yellow-800' :
                     result.analysis.error_type === 'misreading' ? 'bg-blue-100 text-blue-800' :
@@ -207,38 +193,61 @@ const UploadMistake = () => {
                 </div>
 
                 <div>
-                  <span className="text-sm font-medium text-gray-500">置信度：</span>
-                  <span className="text-sm text-gray-900">
+                  <span className="text-sm font-medium text-gray-500">分析置信度：</span>
+                  <span className="text-sm text-gray-900 ml-2">
                     {Math.round(result.analysis.confidence * 100)}%
                   </span>
                 </div>
+              </div>
 
+              {result.mistake.ai_insights && result.mistake.ai_insights.root_cause && (
                 <div>
-                  <span className="text-sm font-medium text-gray-500 block mb-2">学习建议：</span>
-                  <ul className="space-y-1">
-                    {result.analysis.insights.map((insight, index) => (
-                      <li key={index} className="text-sm text-gray-700 flex items-start">
-                        <span className="text-blue-500 mr-2">•</span>
-                        {insight}
+                  <span className="text-sm font-medium text-gray-500 block mb-2">错误根本原因：</span>
+                  <p className="text-sm text-gray-700 bg-gray-50 rounded p-3">
+                    {result.mistake.ai_insights.root_cause}
+                  </p>
+                </div>
+              )}
+
+              <div>
+                <span className="text-sm font-medium text-gray-500 block mb-2">学习建议：</span>
+                <ul className="space-y-2">
+                  {result.analysis.insights.map((insight: string, index: number) => (
+                    <li key={index} className="text-sm text-gray-700 flex items-start bg-blue-50 rounded p-3">
+                      <span className="text-blue-500 mr-2 mt-0.5">💡</span>
+                      {insight}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {result.analysis.similar_questions && result.analysis.similar_questions.length > 0 && (
+                <div>
+                  <span className="text-sm font-medium text-gray-500 block mb-2">推荐练习题目：</span>
+                  <ul className="space-y-2">
+                    {result.analysis.similar_questions.map((question: string, index: number) => (
+                      <li key={index} className="text-sm text-gray-700 flex items-start bg-green-50 rounded p-3">
+                        <span className="text-green-500 mr-2 mt-0.5">📚</span>
+                        {question}
                       </li>
                     ))}
                   </ul>
                 </div>
+              )}
 
-                {result.analysis.similar_questions && result.analysis.similar_questions.length > 0 && (
-                  <div>
-                    <span className="text-sm font-medium text-gray-500 block mb-2">类似题目：</span>
-                    <ul className="space-y-1">
-                      {result.analysis.similar_questions.map((question, index) => (
-                        <li key={index} className="text-sm text-gray-700 flex items-start">
-                          <span className="text-green-500 mr-2">•</span>
-                          {question}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
+              {result.mistake.ai_insights && result.mistake.ai_insights.questions_found && result.mistake.ai_insights.questions_found.length > 0 && (
+                <div>
+                  <span className="text-sm font-medium text-gray-500 block mb-2">识别的题目：</span>
+                  <ul className="space-y-1">
+                    {result.mistake.ai_insights.questions_found.map((question: string, index: number) => (
+                      <li key={index} className="text-sm text-gray-700 flex items-start">
+                        <span className="text-gray-500 mr-2">•</span>
+                        {question}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
 
