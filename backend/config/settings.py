@@ -5,6 +5,7 @@ Configuration settings for the Student Mistakes Management System
 from typing import List, Optional
 from pydantic import Field
 from pydantic_settings import BaseSettings
+from pydantic import Field
 from pydantic.types import SecretStr
 
 
@@ -27,9 +28,9 @@ class RedisSettings(BaseSettings):
 
 class AISettings(BaseSettings):
     """AI model configuration"""
-    qwen_api_key: Optional[SecretStr] = Field(default=None, env="DASHSCOPE_API_KEY")
-    qwen_base_url: str = Field(default="https://dashscope.aliyuncs.com/api/v1", env="QWEN_BASE_URL")
-    qwen_model: str = Field(default="qwen3-vl-plus")
+    dashscope_api_key: Optional[SecretStr] = Field(default=None)
+    qwen_base_url: str = Field(default="https://dashscope.aliyuncs.com/api/v1")
+    qwen_model: str = Field(default="qwen3-vl-plus-2025-12-19")
     qwen_temperature: float = Field(default=0.7)
     qwen_max_tokens: int = Field(default=2000)
     local_models_path: str = Field(default="./models")
@@ -64,6 +65,26 @@ class GamificationSettings(BaseSettings):
     achievements: AchievementSettings = AchievementSettings()
 
 
+class SecuritySettings(BaseSettings):
+    """Security configuration"""
+    secret_key: str = Field(default="your-super-secret-key-change-this-in-production", env="SECRET_KEY")
+    algorithm: str = Field(default="HS256", env="ALGORITHM")
+    access_token_expire_minutes: int = Field(default=30, env="ACCESS_TOKEN_EXPIRE_MINUTES")
+    refresh_token_expire_days: int = Field(default=7, env="REFRESH_TOKEN_EXPIRE_DAYS")
+
+
+class NotificationSettings(BaseSettings):
+    """Email notification configuration"""
+    email: str = Field(default="your-email@example.com", env="NOTIFICATION_EMAIL")
+    password: str = Field(default="your-email-password", env="NOTIFICATION_PASSWORD")
+
+
+class LoggingSettings(BaseSettings):
+    """Logging configuration"""
+    level: str = Field(default="INFO", env="LOG_LEVEL")
+    file: str = Field(default="./logs/app.log", env="LOG_FILE")
+
+
 class APISettings(BaseSettings):
     """API configuration"""
     host: str = Field(default="0.0.0.0", env="API_HOST")
@@ -80,10 +101,14 @@ class Settings(BaseSettings):
     upload: UploadSettings = UploadSettings()
     gamification: GamificationSettings = GamificationSettings()
     api: APISettings = APISettings()
+    security: SecuritySettings = SecuritySettings()
+    notifications: NotificationSettings = NotificationSettings()
+    logging: LoggingSettings = LoggingSettings()
 
     class Config:
         env_file = ".env"
         case_sensitive = False
+        extra = "ignore"  # Allow extra environment variables
 
 
 # Global settings instance

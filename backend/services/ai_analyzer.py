@@ -25,9 +25,9 @@ class MistakeAnalysis:
         error_type: str,
         confidence: float,
         insights: List[str],
-        questions_found: List[str] = None,
-        correct_answers: List[str] = None,
-        root_cause: str = None,
+        questions_found: Optional[List[str]] = None,
+        correct_answers: Optional[List[str]] = None,
+        root_cause: Optional[str] = None,
         similar_questions: Optional[List[str]] = None
     ):
         self.error_type = error_type
@@ -53,7 +53,7 @@ class AIAnalyzer:
             
             # Set up DashScope API
             dashscope.base_http_api_url = settings.ai.qwen_base_url
-            self.api_key = settings.ai.qwen_api_key.get_secret_value() if settings.ai.qwen_api_key else os.getenv('DASHSCOPE_API_KEY')
+            self.api_key = settings.ai.dashscope_api_key.get_secret_value() if settings.ai.dashscope_api_key else None
             
             if not self.api_key:
                 logger.error("DASHSCOPE_API_KEY not configured")
@@ -302,7 +302,7 @@ JSON输出格式：
                 try:
                     response = dashscope.MultiModalConversation.call(
                         api_key=self.api_key,
-                        model='qwen3-vl-plus',
+                        model=settings.ai.qwen_model,
                         messages=messages,
                         response_format={'type': 'json_object'}
                     )

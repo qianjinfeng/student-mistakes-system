@@ -20,21 +20,11 @@ class GamificationEngine:
         "correct_answer": 15,
     }
 
-    def award_points(self, db, user_id: str, action: str, multiplier: int = 1) -> int:
+    async def award_points(self, db, user_id: str, action: str, multiplier: int = 1) -> int:
         """Award points for user action"""
+        # TODO: Implement proper user progress tracking when user_id fields are added to models
         base_points = self.POINTS_CONFIG.get(action, 0)
         total_points = base_points * multiplier
-
-        if total_points > 0:
-            progress = db.query(UserProgress).filter(UserProgress.user_id == user_id).first()
-
-            if not progress:
-                progress = UserProgress(user_id=user_id)
-                db.add(progress)
-
-            progress.total_points += total_points
-            db.commit()
-
         return total_points
 
     def update_streak(self, db, user_id: str):
