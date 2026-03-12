@@ -27,8 +27,8 @@ function getMistakesDir(): string {
 }
 
 function ensureDir(dir: string): void {
-  if (!)) {
-    fs.mkdirSync(dir, { recursive: truefs.existsSync(dir });
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
   }
 }
 
