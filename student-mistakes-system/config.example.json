@@ -1,0 +1,6 @@
+{
+  "mistakesDir": "./mistakes",
+  "qmdEnabled": true,
+  "defaultSubject": "math",
+  "defaultGrade": "grade8"
+}

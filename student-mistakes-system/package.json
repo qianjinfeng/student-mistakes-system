@@ -1,0 +1,27 @@
+{
+  "name": "student-mistakes-manager",
+  "version": "1.0.0",
+  "description": "智能初中错题管理 OpenClaw Skill",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "dependencies": {
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "openclaw": {
+    "skill": "student-mistakes-manager",
+    "tools": [
+      "add_mistake",
+      "get_due_reviews",
+      "update_mastery",
+      "search_mistakes",
+      "get_statistics"
+    ]
+  }
+}
